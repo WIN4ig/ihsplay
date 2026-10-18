@@ -67,19 +67,19 @@ void app_indev_keypad_sdl_key_event(lv_indev_t *indev, const SDL_KeyboardEvent *
     }
     if (key == 0) {
 #ifdef SDL_WEBOS_SCANCODE_EXIT
-        if (event->state == SDL_RELEASED && event->keysym.scancode == SDL_WEBOS_SCANCODE_EXIT) {
+        if (event->type == SDL_KEYUP && event->keysym.scancode == SDL_WEBOS_SCANCODE_EXIT) {
             app_post_event(state->app, APP_UI_NAV_QUIT, NULL, NULL);
         }
 #endif
         return;
     }
-    if (event->state == SDL_PRESSED) {
+    if (event->type == SDL_KEYDOWN) {
         if (state->key == 0) {
             state->key = state->ev_key = key;
             state->state = LV_INDEV_STATE_PRESSED;
             state->changed = true;
         }
-    } else if (event->state == SDL_RELEASED) {
+    } else if (event->type == SDL_KEYUP || event->state == SDL_RELEASED) {
         if (state->key == key) {
             state->ev_key = key;
             state->key = 0;
