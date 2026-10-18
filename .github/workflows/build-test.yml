@@ -21,6 +21,12 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Point core submodule to kxn/ihslib (PIN pairing)
+        run: |
+          git -C core fetch --depth=1 https://github.com/kxn/ihslib.git master
+          git -C core checkout FETCH_HEAD
+          git -C core log --oneline -1
+
       - name: Download ares-cli-rs
         uses: robinraju/release-downloader@v1.9
         with:

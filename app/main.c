@@ -87,6 +87,11 @@ int main(int argc, char *argv[]) {
     /* Caveat: Don't use SDL_WINDOW_FULLSCREEN_DESKTOP on webOS. On older platforms it's not supported. */
     SDL_Window *window = SDL_CreateWindow("IHSplay", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h,
                                           SDL_WINDOW_ALLOW_HIGHDPI | fullscreen_flag);
+    if (window == NULL) {
+        /* Older webOS (3.x) can refuse SDL_WINDOW_FULLSCREEN; retry as desktop-fullscreen. */
+        window = SDL_CreateWindow("IHSplay", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
+                                  SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
     SS4S_PostInit(argc, argv);
 
     lv_disp_t *disp = app_lv_disp_init(window);

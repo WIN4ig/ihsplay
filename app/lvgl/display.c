@@ -8,7 +8,17 @@ static void flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t 
 lv_disp_t *app_lv_disp_init(SDL_Window *window) {
     int width, height;
     SDL_GetWindowSize(window, &width, &height);
-    assert(width > 0 || height > 0);
+    if (width <= 0 || height <= 0) {
+        /* webOS 3.x reports a 0x0 fullscreen window; fall back to the display mode. */
+        SDL_DisplayMode mode;
+        if (SDL_GetDisplayMode(0, 0, &mode) == 0 && mode.w > 0 && mode.h > 0) {
+            width = mode.w;
+            height = mode.h;
+        } else {
+            width = 1920;
+            height = 1080;
+        }
+    }
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     lv_disp_draw_buf_t *draw_buf = malloc(sizeof(lv_disp_draw_buf_t));
