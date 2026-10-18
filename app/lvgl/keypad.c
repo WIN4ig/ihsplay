@@ -56,6 +56,15 @@ void app_indev_keypad_set_ignore(lv_indev_t *indev, bool ignore) {
 void app_indev_keypad_sdl_key_event(lv_indev_t *indev, const SDL_KeyboardEvent *event) {
     keyboard_state_t *state = indev->driver->user_data;
     uint32_t key = key_from_keysym(&event->keysym);
+    {
+        lv_group_t *grp = app_ui_get_input_group(state->app->ui);
+        FILE *dbgf = fopen("/media/developer/ihs-keys.log", "a");
+        if (dbgf != NULL) {
+            fprintf(dbgf, "map key=%u state=%d focused=%p\n", key, event->state,
+                    (void *) (grp != NULL ? lv_group_get_focused(grp) : NULL));
+            fclose(dbgf);
+        }
+    }
     if (key == 0) {
 #ifdef SDL_WEBOS_SCANCODE_EXIT
         if (event->state == SDL_RELEASED && event->keysym.scancode == SDL_WEBOS_SCANCODE_EXIT) {
