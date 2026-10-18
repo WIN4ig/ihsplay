@@ -177,6 +177,18 @@ static uint32_t key_from_keysym(const SDL_Keysym *keysym) {
             return LV_KEY_ESC;
         case SDLK_TAB:
             return keysym->mod & KMOD_SHIFT ? LV_KEY_PREV : LV_KEY_NEXT;
+        /* webOS 3.x: LG's SDL 2.0.4 reports the remote's keys as raw keycodes
+         * instead of SDLK_* keysyms. Values captured on an LG 55UK6100PLA. */
+        case 82:
+            return LV_KEY_UP;
+        case 81:
+            return LV_KEY_DOWN;
+        case 80:
+            return LV_KEY_LEFT;
+        case 79:
+            return LV_KEY_RIGHT;
+        case 40:
+            return LV_KEY_ENTER;
         default:
 #ifdef SDL_WEBOS_SCANCODE_BACK
             switch ((int) keysym->scancode) {
