@@ -32,19 +32,23 @@ jobs:
         with:
           repository: "webosbrew/ares-cli-rs"
           latest: true
-          fileName: "ares-package_*.deb"
-          out-file-path: "temp"
+          fileName: "ares-cli-rs-*-linux-x86_64.tar.gz"
+          out-file-path: "temp/ares"
 
       - name: Download Homebrew Toolbox
         uses: robinraju/release-downloader@v1.9
         with:
           repository: "webosbrew/dev-toolbox-cli"
           latest: true
-          fileName: "webosbrew-toolbox-*.deb"
+          fileName: "webosbrew-toolbox-*_amd64.deb"
           out-file-path: "temp"
 
       - name: Install Tools
-        run: sudo apt-get install ./temp/*.deb
+        run: |
+          tar xzf temp/ares/*.tar.gz -C temp/ares
+          sudo cp temp/ares/ares-cli-rs-*/ares-* /usr/local/bin/
+          sudo chmod +x /usr/local/bin/ares-*
+          sudo apt-get install ./temp/*.deb
 
       - name: Download webOS NDK
         uses: robinraju/release-downloader@v1.9
