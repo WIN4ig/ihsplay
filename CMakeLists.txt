@@ -50,14 +50,10 @@ find_package(Fontconfig REQUIRED)
 find_package(MbedTLS)
 
 # Use SDL2 for window creation and event handling.
-if (TARGET_WEBOS)
-    set(CMAKE_INSTALL_LIBDIR lib/backports)
-    set(SDL2_BACKPORT_REVISION "webOS-2.30.x")
-    include(ExternalSDL2BackportForWebOS)
-    unset(CMAKE_INSTALL_LIBDIR)
-else ()
-    pkg_check_modules(SDL2 REQUIRED sdl2>=2.0.14)
-endif()
+# webOS: link the SDL2 shipped in the NDK sysroot. The bundled 2.30 backport cannot
+# create a usable fullscreen window on webOS 3.x, and the app relies on the TV's own
+# SDL2 at runtime (see the raw-keycode handling in app/lvgl/keypad.c).
+pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(PROTOBUF_C libprotobuf-c)
 pkg_check_modules(OPUS opus)
 
@@ -99,6 +95,12 @@ target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=../../../app/lvgl/lv_conf.h)
 
 add_subdirectory(third_party/ss4s)
 add_subdirectory(third_party/commons)
+
+if (TARGET_WEBOS)
+    # These NDL modules segfault during probing on webOS 3.x and take the whole app
+    # down before it can fall back to lgnc. Ship without them.
+    install(CODE "file(REMOVE \"\${CMAKE_INSTALL_PREFIX}/lib/ss4s-ndl-webos4.so\" \"\${CMAKE_INSTALL_PREFIX}/lib/ss4s-ndl-webos5.so\")")
+endif ()
 
 set(CMAKE_C_STANDARD 11)
 
