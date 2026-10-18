@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <SDL.h>
 #include <lvgl.h>
 
@@ -148,6 +149,15 @@ static void process_events() {
             case SDL_CONTROLLERBUTTONUP:
             case SDL_CONTROLLERDEVICEADDED:
             case SDL_CONTROLLERDEVICEREMOVED: {
+                {
+                    FILE *dbgf = fopen("/media/developer/ihs-keys.log", "a");
+                    if (dbgf != NULL) {
+                        fprintf(dbgf, "ev type=%d sym=%d sc=%d\n", event.type,
+                                event.type == SDL_KEYDOWN || event.type == SDL_KEYUP ? event.key.keysym.sym : -1,
+                                event.type == SDL_KEYDOWN || event.type == SDL_KEYUP ? event.key.keysym.scancode : -1);
+                        fclose(dbgf);
+                    }
+                }
                 bool intercept_by_stream = stream_manager_intercept_event(app->stream_manager, &event);
                 if (!intercept_by_stream) {
                     app_sdl_input_event(app, &event);
