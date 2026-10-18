@@ -198,6 +198,8 @@ static uint32_t key_from_keysym(const SDL_Keysym *keysym) {
             return LV_KEY_RIGHT;
         case 40:
             return LV_KEY_ENTER;
+        case 482:
+            return LV_KEY_ESC;
         default:
 #ifdef SDL_WEBOS_SCANCODE_BACK
             switch ((int) keysym->scancode) {
