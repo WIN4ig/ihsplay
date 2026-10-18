@@ -21,8 +21,10 @@ bool stream_input_handle_key_event(stream_manager_t *manager, const SDL_Keyboard
         }
     }
 #endif
-    if (event->keysym.sym == SDLK_ESCAPE) {
-        if (event->state == SDL_RELEASED) {
+    /* webOS 3.x: the remote's Back key arrives as raw keycode 482, and SDL 2.0.4
+     * reports a bogus `state` field, so key release is detected by event type. */
+    if (event->keysym.sym == SDLK_ESCAPE || event->keysym.sym == 482) {
+        if (event->type == SDL_KEYUP || event->state == SDL_RELEASED) {
             stream_manager_set_overlay_opened(manager, true);
         }
         return true;
