@@ -4,6 +4,18 @@
 #include "ui/app_ui.h"
 
 #include <SDL.h>
+#include <stdio.h>
+#include <unistd.h>
+
+/* Diagnostic key capture, enabled by creating /media/developer/ihs-debug on the TV.
+ * Needed because webOS 3.x delivers raw keycodes instead of SDLK_* keysyms. */
+static int key_capture_enabled(void) {
+    static int cached = -1;
+    if (cached < 0) {
+        cached = access("/media/developer/ihs-debug", F_OK) == 0 ? 1 : 0;
+    }
+    return cached == 1;
+}
 
 typedef struct keyboard_state_t {
     app_t *app;
@@ -56,6 +68,13 @@ void app_indev_keypad_set_ignore(lv_indev_t *indev, bool ignore) {
 void app_indev_keypad_sdl_key_event(lv_indev_t *indev, const SDL_KeyboardEvent *event) {
     keyboard_state_t *state = indev->driver->user_data;
     uint32_t key = key_from_keysym(&event->keysym);
+    if (event->type == SDL_KEYDOWN && key_capture_enabled()) {
+        FILE *dbgf = fopen("/media/developer/ihs-keys.log", "a");
+        if (dbgf != NULL) {
+            fprintf(dbgf, "down sym=%d mapped=%u\n", (int) event->keysym.sym, key);
+            fclose(dbgf);
+        }
+    }
     if (key == 0) {
 #ifdef SDL_WEBOS_SCANCODE_EXIT
         if (event->type == SDL_KEYUP && event->keysym.scancode == SDL_WEBOS_SCANCODE_EXIT) {

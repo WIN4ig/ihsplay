@@ -97,6 +97,11 @@ add_subdirectory(third_party/ss4s)
 add_subdirectory(third_party/commons)
 
 if (TARGET_WEBOS)
+    # webOS 3.x does not ship libudev, which SDL needs to enumerate gamepads.
+    find_library(UDEV_LIBRARY NAMES udev)
+    if (UDEV_LIBRARY)
+        install(FILES ${UDEV_LIBRARY} DESTINATION lib RENAME libudev.so.1)
+    endif ()
     # These NDL modules segfault during probing on webOS 3.x and take the whole app
     # down before it can fall back to lgnc. Ship without them.
     install(CODE "file(REMOVE \"\${CMAKE_INSTALL_PREFIX}/lib/ss4s-ndl-webos4.so\" \"\${CMAKE_INSTALL_PREFIX}/lib/ss4s-ndl-webos5.so\")")
